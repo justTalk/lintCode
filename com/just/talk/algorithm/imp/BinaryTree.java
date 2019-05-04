@@ -5,7 +5,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Stack;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.LinkedTransferQueue;
 
 /**
  * Created by Liu On 2019/4/30
@@ -115,6 +119,50 @@ public class BinaryTree {
             prev =curNode;
         }
         return traversaled;
+    }
+
+    /**
+     * @param root: A Tree
+     * @return: Level order a list of lists of integer
+     */
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        // write your code here
+        List<List<Integer>> orderTraversal = new ArrayList<>();
+        if (root == null) {
+            return orderTraversal;
+        }
+        TreeNode emptyNode = new TreeNode(0);
+        Queue<TreeNode> nodes = new LinkedList<>();
+        nodes.offer(emptyNode);
+        nodes.offer(root);
+        orderTraversal.add(new ArrayList<>());
+        int index = -1;
+        while (!nodes.isEmpty()){
+            TreeNode treeNode = nodes.poll();
+            boolean isNewLevel =  (treeNode == emptyNode);
+            if (isNewLevel){
+                if (index >= 0 && orderTraversal.get(index).isEmpty()) {
+                    orderTraversal.remove(orderTraversal.size() - 1);
+                    orderTraversal.remove(orderTraversal.size() - 1);
+                    break;
+                }
+                index ++;
+                orderTraversal.add(new ArrayList<>());
+                nodes.offer(emptyNode);
+                continue;
+            }
+            List<Integer> curLevel = orderTraversal.get(index);
+            curLevel.add(treeNode.val);
+            TreeNode left = treeNode.left;
+            if (left != null) {
+                nodes.offer(treeNode.left);
+            }
+            TreeNode right = treeNode.right;
+            if (right != null) {
+                nodes.offer(right);
+            }
+        }
+        return orderTraversal;
     }
 
 
