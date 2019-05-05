@@ -131,7 +131,7 @@ public class BinaryTree {
         if (root == null) {
             return orderTraversal;
         }
-        TreeNode emptyNode = new TreeNode(0);
+        TreeNode emptyNode = new TreeNode(0);//设计一个空节点来区分层级 连续两个空节点则标示遍历结束了
         Queue<TreeNode> nodes = new LinkedList<>();
         nodes.offer(emptyNode);
         nodes.offer(root);
