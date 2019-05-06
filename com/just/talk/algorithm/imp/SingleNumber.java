@@ -103,6 +103,55 @@ public class SingleNumber {
         return smallHeader != null ? smallHeader : bigerHeader;
     }
 
+
+    /*
+     * 移出有序数组中重复的元素 并返回剩余的元素个数
+     * 正向思维 ：检查出相同的次数 不相同的数 = 总次数 - 相同的次数 中间产生了过多的交换数据操作
+     * @param nums: An ineger array
+     * @return: An integer
+     */
+    public int removeDuplicates(int[] nums) {
+        // write your code here
+        if (nums == null) {
+            return 0;
+        }
+        int size = nums.length;
+        if (nums.length <= 1){
+            return size;
+        }
+        for (int i = 1; i < size; ) {
+            if (nums[i - 1] == nums[i]) {
+                size--;
+                int tmp = nums[i];
+                for (int j = i; j < size; j++) {
+                    nums[j] = nums[j + 1];
+                }
+                nums[size] = tmp;
+            }else {
+                i++;
+            }
+        }
+        return size;
+    }
+
+    /**
+     * 逆向思维：直接找出不相同的数据
+     */
+    public int removeDuplicatesOpt(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        int size = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[size] != nums[i]) {
+                nums[++size] = nums[i];
+            }
+        }
+        return size + 1;
+    }
+
+
+
     public static class ListNode {
         int val;
         ListNode next;
