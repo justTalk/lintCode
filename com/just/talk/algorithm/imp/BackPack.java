@@ -16,9 +16,12 @@ public class BackPack {
         if (m == 0 || A == null || A.length == 0) {
             return 0;
         }
-        return m - minUnUsed(m, A, 0);
+        return dynicOpt(m, A);
     }
 
+    /**
+     * 回溯思想的实现 但是出现了死循环
+     */
     public int minUnUsed(int m, int[] A, int i){
         if (m == 0 || i == A.length) {
             return m;
@@ -33,6 +36,7 @@ public class BackPack {
     }
 
     /**
+     * 动态规划的设计思路
      * 事件复杂度 m * n
      * 空间复杂度 m
      */
@@ -146,5 +150,40 @@ public class BackPack {
             }
         }
         return ++size;
+    }
+
+    /**
+     *   A B C D C D
+     * B # * # # # #
+     * C # # * # * #
+     * D # # # * # *
+     * 将问题转换为单个字符对比，斜线的是子串
+     * 最大公有子串
+     * @param A: A string
+     * @param B: A string
+     * @return: the length of the longest common substring.
+     */
+    public int longestCommonSubstring(String A, String B) {
+        // write your code here
+        if (A.length() == 0 || B.length() == 0) {
+            return 0;
+        }
+        int maxCommonSub = 0;
+        int[][] store = new int[A.length() + 1][B.length() + 1];
+        for (int i = 0; i < A.length(); i++) {
+            for (int j = 0; j < B.length(); j++) {
+                if (A.charAt(i) == B.charAt(j)) {
+                    store[i+1][j+1] = (i == 0 || j == 0) ? 1 : 1 + store[i][j];
+                }
+            }
+        }
+        for (int i = 1; i <= A.length(); i++) {
+            for (int j = 1; j <= B.length(); j++) {
+                if (store[i][j] > maxCommonSub) {
+                    maxCommonSub = store[i][j];
+                }
+            }
+        }
+        return maxCommonSub;
     }
 }
