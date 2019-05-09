@@ -186,4 +186,69 @@ public class BackPack {
         }
         return maxCommonSub;
     }
+
+    /**
+     * @param triangle: a list of lists of integers
+     * @return: An integer, minimum path sum
+     */
+    public int minimumTotal(int[][] triangle) {
+        // write your code here
+        if (triangle == null || triangle.length == 0){
+            return 0;
+        }
+        boolean[][] state = new boolean[triangle.length][];
+        for(int i = 0; i< triangle.length; i++){
+            state[i] = new boolean[triangle[i].length];
+        }
+        return minTotalRecursive(triangle, 0, 0, state);
+    }
+
+    /**
+     * 回溯 递归
+     */
+    public int minTotalRecursive(int[][] triangle, int level, int index, boolean[][] state){
+        if (level == triangle.length - 1) {
+            return triangle[level][index];
+        }
+        if (state[level][index]) {
+            return triangle[level][index];
+        }
+        int[] curLevel = triangle[level];
+        int left = minTotalRecursive(triangle, level + 1, index, state);
+        int right = minTotalRecursive(triangle, level + 1, index + 1, state);
+        curLevel[index] = left < right ? left + curLevel[index] : right + curLevel[index];
+        state[level][index] = true;
+        return curLevel[index];
+    }
+
+    public int minTotal(int[][] triangle){
+        for (int i = triangle.length - 1; i > 0; i--) {
+            for (int j = 0; j < triangle[i].length - 1; j++) {
+                triangle[i - 1][j] = triangle[i][j] < triangle[i][j+1] ? triangle[i][j] + triangle[i - 1][j] : triangle[i][j + 1] + triangle[i - 1][j];
+            }
+        }
+        return triangle[0][0];
+    }
+
+    /**
+     * 最小路径和
+     */
+    public int minPathSum(int[][] grid){
+        if (grid == null || grid.length == 0) {
+            return 0;
+        }
+        for(int i = 1; i < grid[0].length; i++){
+            grid[0][i] = grid[0][i-1] + grid[0][i];
+        }
+        for(int i = 1; i < grid.length; i++){
+            grid[i][0] = grid[i - 1][0] + grid[i][0];
+        }
+
+        for(int i = 1; i< grid.length; i++){
+            for(int j = 1; j < grid[i].length; j++){
+                grid[i][j] = grid[i - 1][j] < grid[i][j-1] ?  grid[i - 1][j] + grid[i][j] : grid[i][j-1] + grid[i][j];
+            }
+        }
+        return grid[grid.length - 1][grid[grid.length-1].length-1];
+    }
 }
