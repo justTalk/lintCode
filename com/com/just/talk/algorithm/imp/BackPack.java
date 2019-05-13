@@ -251,4 +251,47 @@ public class BackPack {
         }
         return grid[grid.length - 1][grid[grid.length-1].length-1];
     }
+
+    /**
+     * 这种算法会超时，当长度唱过18后，目前不知道为什么，尴尬
+     */
+    public static int maxProductRecursive(int[] nums, int index, int lastIndex, int maxProduct){
+        if (index == nums.length - 1) {
+            if (index == lastIndex) {
+                return maxProduct * nums[index] > maxProduct ? (maxProduct * nums[index] > nums[index] ? maxProduct * nums[index] : nums[index])  : maxProduct > nums[index] ? maxProduct: nums[index] ;
+            }else{
+                return maxProduct > nums[index] ? maxProduct : nums[index];
+            }
+        }
+        int a = maxProductRecursive(nums, index + 1, index + 1, maxProduct * nums[index]);
+        int b = maxProductRecursive(nums, index + 1, index, nums[index]);
+        return a > b ? (a > maxProduct ? a : maxProduct) : (b > maxProduct ? b : maxProduct);
+    }
+
+    /**
+     * 求乘积最大的连续子序列长度
+     * @param nums: An array of integers
+     * @return: An integer
+     */
+    public static int maxProduct(int[] nums) {
+        int[] max = new int[nums.length];
+        int[] min = new int[nums.length];
+
+        min[0] = max[0] = nums[0];
+        int result = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            min[i] = max[i] = nums[i];
+            if (nums[i] > 0) {
+                max[i] = Math.max(max[i], max[i - 1] * nums[i]);
+                min[i] = Math.min(min[i], min[i - 1] * nums[i]);
+            } else if (nums[i] < 0) {
+                max[i] = Math.max(max[i], min[i - 1] * nums[i]);
+                min[i] = Math.min(min[i], max[i - 1] * nums[i]);
+            }
+
+            result = Math.max(result, max[i]);
+        }
+
+        return result;
+    }
 }
