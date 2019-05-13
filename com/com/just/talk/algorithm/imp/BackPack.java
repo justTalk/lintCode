@@ -294,4 +294,36 @@ public class BackPack {
 
         return result;
     }
+
+    /**
+     * 爬楼梯
+     * @param n: An integer
+     * @return: An integer
+     */
+    public int climbStairsRecursive(int n) {
+        if (n < 3) {
+            return n;
+        }
+        return climbStairsRecursive(n-1) + climbStairsRecursive(n - 2);
+    }
+
+    /**
+     * 爬楼梯
+     * @param n: An integer
+     * @return: An integer
+     */
+    public int climbStairs(int n){
+        if (n < 3) {
+            return n;
+        }
+        int a = 1;
+        int b = 1;
+        for (int i = n; i > 3; i--) {
+            int preA = a;
+            a = a + b;
+            b = preA;
+        }
+        return 2 * a + b;
+    }
+
 }
