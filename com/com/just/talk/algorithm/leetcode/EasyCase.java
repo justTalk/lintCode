@@ -317,4 +317,84 @@ public class EasyCase {
         }
         return Math.max(Math.max(leftAns, rightAns), leftMax + rightMax);
     }
+
+    /**
+     * https://leetcode.com/problems/length-of-last-word/submissions/
+     */
+    public int lengthOfLastWord(String s) {
+        if (s == null || s.length() == 0) {
+            return 0;
+        }
+        int len = 0;
+        for(int i = s.length() - 1; i >= 0; i--){
+            if (s.charAt(i) != ' ') {
+                len++;
+                continue;
+            }
+            if (len > 0) {
+                break;
+            }
+        }
+        return len;
+    }
+
+    public int[] plusOne(int[] digits) {
+        int len = digits.length;
+        int tmp = 0;
+        for(int i = len - 1; i >= 0; i--){
+            tmp = digits[i] + 1;
+            if (tmp < 10) {
+                digits[i] = tmp;
+                return digits;
+            }else {
+                digits[i] = tmp % 10;
+                tmp = tmp / 10;
+            }
+        }
+        int[] data = new int[len + 1];
+        data[0] = tmp;
+        for(int i = 1; i <= len; i++){
+            data[i] = digits[i-1];
+        }
+        return data;
+    }
+
+    public String addBinary(String a, String b) {
+        int offset = Math.abs(a.length() - b.length());
+        String max = a;
+        String min = b;
+        if (a.length() < b.length()) {
+            max = b;
+            min = a;
+        }
+        int tmp = 0;
+        int[] data = new int[max.length() + 1];
+        for (int i = max.length() - 1; i >= 0; i--) {
+            if (i - offset >= 0) {
+                int sum = max.charAt(i) + min.charAt(i - offset) + tmp - 48 * 2;
+                if (sum > 1) {
+                    tmp = sum / 2;
+                    data[i+1] = sum % 2;
+                }else {
+                    data[i+1] = sum;
+                    tmp = 0;
+                }
+            }else {
+                int sum = max.charAt(i) + tmp - 48;
+                if (sum > 1) {
+                    tmp = sum / 2;
+                    data[i+1] = sum % 2;
+                }else {
+                    data[i+1] = sum;
+                    tmp = 0;
+                }
+            }
+        }
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(tmp > 0 ? tmp : "");
+        for (int i = 1; i < data.length; i++) {
+            stringBuffer.append(data[i]);
+        }
+        return stringBuffer.toString();
+    }
 }
