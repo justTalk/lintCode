@@ -245,4 +245,76 @@ public class EasyCase {
         }
         return validIndex + 1;
     }
+
+    /**
+     * https://leetcode.com/problems/search-insert-position/
+     */
+    public int searchInsert(int[] nums, int target) {
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] >= target) {
+                return i;
+            }
+        }
+        return nums == null ? 0 : nums.length;
+    }
+
+    /**
+     * https://leetcode.com/problems/count-and-say/
+     */
+    public String countAndSay(int n) {
+        String say = "1";
+        for (int i = 1; i < n; i++) {
+            int count = 1;
+            StringBuffer tmp = new StringBuffer();
+            int j = 0;
+            for (; j < say.length() - 1; j++) {
+                if (say.charAt(j) != say.charAt(j+1)) {
+                    tmp.append(count).append(say.charAt(j));
+                    count = 1;
+                    continue;
+                }
+                count++;
+            }
+            say = tmp.append(count).append(say.charAt(j)).toString();
+        }
+        return say;
+    }
+
+    /**
+     * https://leetcode.com/problems/maximum-subarray/
+     */
+    public int maxSubArray(int[] nums) {
+        int len = nums.length;
+        int max= nums[0];
+        int dp = nums[0];
+        for (int i = 0; i < len; i++) {
+            dp = nums[i] + (dp > 0 ? dp : 0);
+            if (dp > max) {
+                max = dp;
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 最大连续子序列 分之方法
+     */
+    private int helper(int[] nums, int left, int right) {
+        if (left >= right) return nums[left];
+        int mid = (left + right) >> 1;
+        int leftAns = helper(nums, left, mid);
+        int rightAns = helper(nums, mid + 1, right);
+        int leftMax = nums[mid], rightMax = nums[mid + 1];
+        int temp = 0;
+        for (int i = mid; i >= left; --i) {
+            temp += nums[i];
+            if (temp > leftMax) leftMax = temp;
+        }
+        temp = 0;
+        for (int i = mid + 1; i <= right; ++i) {
+            temp += nums[i];
+            if (temp > rightMax) rightMax = temp;
+        }
+        return Math.max(Math.max(leftAns, rightAns), leftMax + rightMax);
+    }
 }
