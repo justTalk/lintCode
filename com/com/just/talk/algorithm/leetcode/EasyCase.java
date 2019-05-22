@@ -3,6 +3,8 @@ package com.just.talk.algorithm.leetcode;
 import com.just.talk.algorithm.object.ListNode;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 
 /**
@@ -396,5 +398,91 @@ public class EasyCase {
             stringBuffer.append(data[i]);
         }
         return stringBuffer.toString();
+    }
+
+
+    /**
+     * https://leetcode.com/problems/sqrtx/
+     */
+    public int mySqrt(int x) {
+        if (x == 0 || x == 1) {
+            return x;
+        }
+        for(long i = 1; i <= x; i++){
+            long tmp = i * i;
+            if (tmp > x) {
+                return (int) (i - 1);
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * 牛顿迭代法求平方根
+     */
+    public int sqrt(int x) {
+        long n = x;
+        while (n * n > x) {
+            n = (n + x / n) >> 1;
+        }
+        return (int) n;
+    }
+
+    /**
+     * https://leetcode.com/problems/climbing-stairs/
+     * 爬台阶 f(n) = f(n-1) + f(n-2)
+     */
+    public int climbStairs(int n) {
+        if (n < 3) {
+            return n;
+        }
+        int f = 1;
+        int s = 1;
+        for (int i = 3; i < n; i++) {
+            f = f + s;
+            s = f - s;
+        }
+        return 2 * f + s;
+    }
+
+    /**
+     * 爬楼梯 广度优先算法 很容易栈溢出
+     */
+    public int climbStairsBreadthFirst(int n){
+        if (n < 3) {
+            return n;
+        }
+        Queue queue = new LinkedList();
+        queue.offer(n);
+        int count = 1;
+        while (!queue.isEmpty()){
+            int a = (int) queue.poll();
+            if (a > 1) {
+                count++;
+                queue.offer(a-1);
+                queue.offer(a-2);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 爬楼梯 深度优先算法
+     */
+    public int climbStairsDeepFirst(int n, int[] cache){
+        if (n < 3) {
+            return n;
+        }
+        int n1 = cache[n-1];
+        if (n1 == 0) {
+            n1 = climbStairsDeepFirst(n-1, cache);
+            cache[n-1] = n1;
+        }
+        int n2 = cache[n-2];
+        if (n2 == 0) {
+            n2 = climbStairsDeepFirst(n-2, cache);
+            cache[n-2] = n2;
+        }
+        return  n1 + n2;
     }
 }
