@@ -1,6 +1,7 @@
 package com.just.talk.algorithm.leetcode;
 
 import com.just.talk.algorithm.object.ListNode;
+import com.just.talk.algorithm.object.TreeNode;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -484,5 +485,81 @@ public class EasyCase {
             cache[n-2] = n2;
         }
         return  n1 + n2;
+    }
+
+    /**
+     * https://leetcode.com/problems/remove-duplicates-from-sorted-list/
+     */
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode pre = head;
+        ListNode cur = head.next;
+        while (cur != null){
+            if (pre.val != cur.val) {
+                pre = pre.next = cur;
+            }
+            cur = cur.next;
+        }
+        pre.next = null;
+        return head;
+    }
+
+    /**
+     * 参考归并排序中的合并过程==》归并排序：
+     * https://leetcode.com/problems/merge-sorted-array/
+     * space n+m
+     * time n+m
+     */
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        int[] sorted = new int[n+m];
+        int i = 0;
+        int j = 0;
+        for (int k = 0; k < sorted.length; k++) {
+            if (i >= m) {
+                sorted[k] = nums2[j];
+                j++;
+                continue;
+            }
+            if (j >= n) {
+                sorted[k] = nums1[i];
+                i++;
+                continue;
+            }
+
+            if (nums1[i] < nums2[j]) {
+                sorted[k] = nums1[i];
+                i++;
+            }else {
+                sorted[k] = nums2[j];
+                j++;
+            }
+        }
+        for (int k = 0; k < sorted.length; k++) {
+            nums1[k] = sorted[k];
+        }
+    }
+
+    /**
+     * 比较两棵树是否相等
+     * 思路：
+     * 1.深度遍历优先 递归实现
+     * 2.广度遍历优先 队列实现
+     * https://leetcode.com/problems/same-tree/
+     */
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        if (p !=  null && q != null) {
+            return q.val == p.val && isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+        }
+
+        return p == q;
+    }
+
+    /**
+     * https://leetcode.com/problems/symmetric-tree/
+     */
+    public boolean isSymmetric(TreeNode root) {
+        return false;
     }
 }
