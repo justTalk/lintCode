@@ -5,6 +5,7 @@ import com.just.talk.algorithm.object.TreeNode;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -558,8 +559,64 @@ public class EasyCase {
 
     /**
      * https://leetcode.com/problems/symmetric-tree/
+     * 采用广度优先算法
      */
     public boolean isSymmetric(TreeNode root) {
-        return false;
+        if (root == null) {
+            return true;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root.left);
+        queue.offer(root.right);
+        while (!queue.isEmpty()){
+            Queue<TreeNode> curLevel = new LinkedList<>();
+            for (TreeNode cur:
+                 queue) {
+                if (cur != null) {
+                    curLevel.offer(cur.left);
+                    curLevel.offer(cur.right);
+                }
+            }
+
+            while (!queue.isEmpty()){
+                TreeNode first = ((LinkedList<TreeNode>) queue).pollFirst();
+                TreeNode last = ((LinkedList<TreeNode>) queue).pollLast();
+                if (first != null && last != null && first.val == last.val
+                        || (first == null && last == null)) {
+
+                }else {
+                    return false;
+                }
+            }
+            queue = curLevel;
+        }
+        return true;
+    }
+
+    /**
+     * 镜像树的深度搜索优先
+     */
+    public boolean isSymmetricByDeepFirst(TreeNode left, TreeNode right) {
+        if (left == null || right == null) return left == right;
+        if (left.val != right.val) return false;
+        return isSymmetricByDeepFirst(left.left, right.right) && isSymmetricByDeepFirst(left.right, right.left);
+    }
+
+    /**
+     * https://leetcode.com/problems/maximum-depth-of-binary-tree/
+     * 深度优先
+     */
+    public int maxDepth(TreeNode root, int depth) {
+        if (root == null) {
+            return depth;
+        }
+        return Math.max(maxDepth(root.left, depth + 1), maxDepth(root.right, depth + 1));
+    }
+
+    /**
+     * https://leetcode.com/problems/binary-tree-level-order-traversal-ii/
+     */
+    public List<List<Integer>> levelOrderBottom(TreeNode root) {
+        return null;
     }
 }
