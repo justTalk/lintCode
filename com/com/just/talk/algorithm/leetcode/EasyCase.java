@@ -3,6 +3,7 @@ package com.just.talk.algorithm.leetcode;
 import com.just.talk.algorithm.object.ListNode;
 import com.just.talk.algorithm.object.TreeNode;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -615,8 +616,115 @@ public class EasyCase {
 
     /**
      * https://leetcode.com/problems/binary-tree-level-order-traversal-ii/
+     * 广度优先
      */
     public List<List<Integer>> levelOrderBottom(TreeNode root) {
-        return null;
+        List<List<Integer>> result = new LinkedList<>();
+        if (root == null) {
+            return result;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()){
+            List<Integer> level = new LinkedList<>();
+            Queue<TreeNode> nextLevel = new LinkedList<>();
+            while (!queue.isEmpty()){
+                TreeNode treeNode = queue.poll();
+                if (treeNode != null) {
+                    level.add(treeNode.val);
+                    nextLevel.offer(treeNode.left);
+                    nextLevel.offer(treeNode.right);
+                }
+            }
+            if (!level.isEmpty()) {
+                result.add(level);
+            }
+            queue = nextLevel;
+        }
+        Collections.reverse(result);
+        return result;
+    }
+
+    public void levelOrderBottom(TreeNode node, int level, List<List<Integer>> list) {
+        if (node == null) {
+            return;
+        }
+        List<Integer> list1;
+        if (level < list.size()) {
+            list1 = list.get(level);
+        }else {
+            list1 = new LinkedList<>();;
+            list.add(0,list1);
+        }
+
+        list1.add(node.val);
+        levelOrderBottom(node.left, level + 1, list);
+        levelOrderBottom(node.right, level + 1, list);
+    }
+
+    /**
+     * https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/
+     */
+    public TreeNode sortedArrayToBST(int[] nums) {
+        if (nums == null || nums.length == 0) return null;
+        return tree(nums, 0, nums.length - 1);
+    }
+
+    private TreeNode tree(int[] nums, int left, int right) {
+        if (left > right) return null;
+        int mid = (left + right) >>> 1;
+        TreeNode node = new TreeNode(nums[mid]);
+        node.left = tree(nums, left, mid - 1);
+        node.right = tree(nums, mid + 1, right);
+        return node;
+    }
+
+    /**
+     * https://leetcode.com/problems/balanced-binary-tree/
+     * a binary tree in which the depth of the two subtrees of every node never differ by more than 1
+     */
+    public boolean isBalanced(TreeNode root) {
+        if (root == null) {
+            return true;
+        }
+        if (Math.abs(maxDepth(root.left, 0) - maxDepth(root.right, 0)) > 1) {
+            return false;
+        }
+        return isBalanced(root.left) && isBalanced(root.right);
+    }
+
+    /**
+     * https://leetcode.com/problems/minimum-depth-of-binary-tree/
+     */
+    public int minDepth(TreeNode root) {
+        return minDepth(root, 0);
+    }
+
+    public int minDepth(TreeNode root, int depth) {
+        if (root == null) {
+            return depth;
+        }
+        if (root.left != null && root.right != null) {
+            return Math.min(minDepth(root.left, depth +1), minDepth(root.right, depth +1));
+        }
+        return Math.max(minDepth(root.left, depth +1), minDepth(root.right, depth +1));
+    }
+
+    /**
+     * https://leetcode.com/problems/path-sum/
+     * 跟节点到叶子节点的和等于sum
+     */
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if (root == null) {
+            return false;
+        }
+        return hasPath(root, sum);
+    }
+
+    public boolean hasPath(TreeNode root, int sum){
+        if (root == null) {
+            return sum == 0;
+        }
+        return hasPath(root.left, sum - root.val) || hasPath(root.right, sum - root.val);
     }
 }
