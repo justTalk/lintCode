@@ -3,6 +3,7 @@ package com.just.talk.algorithm.leetcode;
 import com.just.talk.algorithm.object.ListNode;
 import com.just.talk.algorithm.object.TreeNode;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -722,9 +723,133 @@ public class EasyCase {
     }
 
     public boolean hasPath(TreeNode root, int sum){
-        if (root == null) {
-            return sum == 0;
+        if (root.left == null && root.right == null) {
+            return sum == root.val;
+        }
+        if (root.left == null) {
+            return hasPath(root.right, sum - root.val);
+        }
+        if (root.right == null) {
+            return hasPath(root.left, sum - root.val);
         }
         return hasPath(root.left, sum - root.val) || hasPath(root.right, sum - root.val);
+    }
+
+    public List<List<Integer>> generate(int numRows){
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> lastLine = null;
+        for (int i = 0; i < numRows; i++) {
+            List<Integer> line = new ArrayList<>();
+            if (lastLine != null) {
+                line.add(lastLine.get(0));
+                for (int j = 1; j < lastLine.size(); j++) {
+                    line.add(lastLine.get(j) + lastLine.get(j-1));
+                }
+                line.add(lastLine.get(lastLine.size() - 1));
+                result.add(line);
+                lastLine = line;
+            }else {
+                lastLine = new ArrayList<>();
+                lastLine.add(1);
+                result.add(lastLine);
+            }
+        }
+        return result;
+    }
+
+    public List<Integer> getRow(int rowIndex) {
+        List<Integer> row = new ArrayList();
+        List<Integer> last = new ArrayList();
+        last.add(1);
+        if (rowIndex == 0) {
+            return last;
+        }
+        for(int i = 1; i<= rowIndex; i++){
+            row.add(1);
+            for (int j = 1; j < last.size(); j++){
+                row.add(last.get(j) + last.get(j-1));
+            }
+            row.add(1);
+            last.clear();
+            List<Integer> tmp = last;
+            last = row;
+            row = tmp;
+        }
+        return last;
+    }
+
+    /**
+     * https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
+     * 寻找最大买卖效益 只允许交易一次
+     */
+    public int maxProfit(int[] prices) {
+        return maxProfit(prices, 0, prices.length - 1);
+    }
+
+    public int maxProfit(int[] prices, int start, int end){
+        if (start >= end) {
+            return 0;
+        }
+        int half = (start + end) >> 1;
+        int leftMax = maxProfit(prices, start, half);
+        int rightMax = maxProfit(prices, half + 1, end);
+        int min = prices[start++];
+        int max = 0;
+        while (half>=start){
+            if (prices[start] < min) {
+                min = prices[start];
+            }
+            start++;
+        }
+        while (end > half){
+            if (prices[end] > max) {
+                max = prices[end];
+            }
+            end--;
+        }
+        return Math.max(leftMax, Math.max(rightMax, max - min));
+    }
+
+    /**
+     * https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/
+     * 寻找最大买卖效益 允许交易多次 但不能持仓多次加仓
+     * 思路：实际上是找出序列中的顺序对，如果找到比自己大的直接算本次获利，如果比自己小，就将自己成本降低为当前值
+     */
+    public int maxProfitII(int[] prices) {
+        if (prices == null || prices.length <= 1) {
+            return 0;
+        }
+        int i = 0;
+        int j = 1;
+        int max = 0;
+        for (;j < prices.length; j++){
+            if (prices[i] < prices[j]) {
+                max += prices[j] - prices[i];
+                i = j;
+            }else {
+                i++;
+            }
+        }
+        return max;
+    }
+
+    /**
+     * https://leetcode.com/problems/diameter-of-binary-tree/
+     * 求二叉树的最大直径
+     * 思路：最大直径就是找到两个点之间的最大的边数，以每一个节点为例，会有三种情况
+     * 1.最大直径过包含当前节点
+     * 2.最大直径在左子树
+     * 3.最大直径在右子树
+     * 比较上述三种情况得出最大值
+     * 缺点：遍历了两次
+     * 更优解法：https://github.com/Blankj/awesome-java-leetcode/blob/master/note/543/README.md
+     */
+    public int diameterOfBinaryTree(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int left = maxDepth(root.left, 0);
+        int right = maxDepth(root.right, 0);
+        return Math.max(left + right, Math.max(diameterOfBinaryTree(root.left), diameterOfBinaryTree(root.right)));
     }
 }
