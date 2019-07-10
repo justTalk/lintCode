@@ -8,7 +8,7 @@ import java.util.List;
  * Description:
  * email: mingming.liu@quvideo.com
  */
-public abstract class ElementGroup extends Element {
+public abstract class ElementGroup extends Element implements ElementManager{
 
     List<Element> mChildren = new ArrayList<>();
 
