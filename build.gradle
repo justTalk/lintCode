@@ -1,0 +1,9 @@
+apply plugin: 'java'
+apply plugin: 'application'
+mainClassName = 'talk.algorithm.Main'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
+sourceCompatibility = "8"
+targetCompatibility = "8"
