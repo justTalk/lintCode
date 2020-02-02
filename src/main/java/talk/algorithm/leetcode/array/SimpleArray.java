@@ -190,4 +190,96 @@ public class SimpleArray{
         // 表示将nums2数组从下标0位置开始，拷贝到nums1数组中，从下标0位置开始，长度为len2+1
         System.arraycopy(nums2, 0, nums1, 0, len2 + 1);
     }
+
+    /*
+     * @Author Andy
+     * @Description 乘最多水的容器 https://leetcode-cn.com/problems/container-with-most-water/
+     * @Date 11:58 2020-01-14
+     * @Param
+     * @return T(n) O(1)
+     * 游标法：游标比较后 变动的时候 能帮助定位到下一个更大或者更小的数据项 故能减少遍历次数
+     **/
+    public int maxArea(int[] height) {
+        int start = 0, end = height.length - 1;
+        int maxArea = 0;
+        while (start <= end){
+            int tempHeight = 0;
+            int tempWidth = end - start;
+            if (height[start] < height[end]) {
+                tempHeight = height[start];
+                start++;
+            }else {
+                tempHeight = height[end];
+                end--;
+            }
+            int tmpArea = tempWidth * tempHeight;
+            if (tmpArea > maxArea){
+                maxArea = tmpArea;
+            }
+
+        }
+        return maxArea;
+    }
+
+    /*
+     * @Author Andy
+     * @Description 接雨水 https://leetcode-cn.com/problems/trapping-rain-water/
+     * @Date 11:56 2020-01-23
+     * @Param
+     * @return
+     * 求每一列的值:每一列能收集的水 = Math.min(left, right) - height[i]
+     **/
+    public int trap(int[] height) {
+        int trap = 0;
+        int[] maxRight = new int[height.length];
+        for (int j = height.length - 2; j >= 0; j--) {
+            maxRight[j] = Math.max(height[j + 1], maxRight[j + 1]);
+        }
+        int maxLeft = 0;
+        for (int i = 1; i < height.length; i++) {
+            maxLeft = Math.max(maxLeft, height[i - 1]);
+
+            int maxHeight = Math.min(maxLeft, maxRight[i]);
+            trap += Math.max(maxHeight - height[i], 0);
+        }
+        return trap;
+    }
+
+    /*
+     * @Author Andy
+     * @Description 接雨水 https://leetcode-cn.com/problems/trapping-rain-water/
+     * @Date 11:12 2020-02-02
+     * @Param
+     * @return
+     * 双指针遍历 减少求左边和右边最大值的计算
+     **/
+    public int trap2(int[] height) {
+        int sum = 0;
+        int max_left = 0;
+        int max_right = 0;
+        int left = 1;
+        int right = height.length - 2; // 加右指针进去
+        for (int i = 1; i < height.length - 1; i++) {
+            //从左到右更: TODO 这里最关键的是转变一个思想:求左右边的最大值的目标是为了找出其相对较小值 所以不用一定求出两边最大 只需要求出一边有值大于另一边的最大值
+            if (height[left - 1] < height[right + 1]) {
+                max_left = Math.max(max_left, height[left - 1]);
+                int min = max_left;
+                if (min > height[left]) {
+                    sum = sum + (min - height[left]);
+                }
+                left++;
+                //从右到左更
+            } else {
+                max_right = Math.max(max_right, height[right + 1]);
+                int min = max_right;
+                if (min > height[right]) {
+                    sum = sum + (min - height[right]);
+                }
+                right--;
+            }
+        }
+        return sum;
+    }
+
+
 }
