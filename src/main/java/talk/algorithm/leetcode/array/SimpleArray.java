@@ -1,5 +1,8 @@
 package talk.algorithm.leetcode.array;
 
+import java.util.Arrays;
+import java.util.HashMap;
+
 public class SimpleArray{
 
     /*
@@ -281,5 +284,168 @@ public class SimpleArray{
         return sum;
     }
 
+    /*
+     * @Author Andy
+     * @Description https://leetcode-cn.com/problems/jump-game/
+     * @Date 11:42 2020-02-02
+     * @Param 递归思路：会超出时间限制
+     * @return
+     **/
+    @Deprecated
+    public boolean canJump(int[] nums) {
+        return nums.length > 0 && recursiveJump(nums, 0, nums.length - 1);
+    }
 
+    private boolean recursiveJump(int[] nums, int start, int end){
+        if (start == end) {
+            return true;
+        }
+        for (int i = 1; i <= nums[start]; i++) {
+            if (recursiveJump(nums, start + i, end)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*
+     * @Author Andy
+     * @Description 优化递归。保存已递归的case 减少递归次数 => 能通过 但是效率不高
+     * @Date 09:43 2020-02-08
+     * @Param
+     * @return
+     **/
+    private boolean recursiveJumpOpt(int[] nums, int start, int end, int[] state){
+        if (start == end) {
+            return true;
+        }
+        if (state[start] != 0) {
+            return false;
+        }
+        for (int i = 1; i <= nums[start]; i++) {
+            if (recursiveJumpOpt(nums, start + i, end, state)) {
+                return true;
+            }
+        }
+        state[start] = 1;
+        return false;
+    }
+
+    /*
+     * @Author Andy
+     * @Description 思路：只要满足 能到达的位置上的值大于1 就可以跳转到该位置
+     * @Date 09:57 2020-02-08
+     * @Param T(N) O(1)
+     * @return
+     **/
+    public boolean canJumpOpt(int[] nums){
+        int maxReachIndex = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (i > maxReachIndex) {
+                return false;
+            }
+            int curMaxReachIndex = nums[i] + i;
+            if (curMaxReachIndex > maxReachIndex) {
+                maxReachIndex = curMaxReachIndex;
+            }
+        }
+        return true;
+    }
+    
+
+    /*
+     * @Author Andy
+     * @Description https://leetcode-cn.com/problems/3sum-closest/ 找最接近的三数之和
+     * @Date 10:00 2020-02-08
+     * @Param
+     * @return 
+     **/
+    public int threeSumClosest(int[] nums, int target) {
+        int sumClosest = target - (nums[0] + nums[1] + nums[2]);
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = i + 1; j < nums.length; j++) {
+                for (int k = j + 1; k < nums.length; k++) {
+                    int closest = target - (nums[i] + nums[j] + nums[k]);
+                    sumClosest = Math.abs(sumClosest) > Math.abs(closest) ? closest:sumClosest;
+                }
+            }
+        }
+        return target - sumClosest;
+
+    }
+
+    public int threeSumClosestOpt(int[] nums, int target){
+        Arrays.sort(nums);
+        int ans = nums[0] + nums[1] + nums[2];
+        for(int i=0;i<nums.length;i++) {
+            int start = i+1, end = nums.length - 1;
+            while(start < end) {
+                int sum = nums[start] + nums[end] + nums[i];
+                if(Math.abs(target - sum) < Math.abs(target - ans)) {
+                    ans = sum;
+                }
+                if(sum > target) {
+                    end--;
+                } else if(sum < target) {
+                    start++;
+                } else {
+                    return ans;
+                }
+            }
+        }
+        return ans;
+    }
+
+    /*
+     * @Author Andy
+     * @Description https://leetcode-cn.com/problems/maximum-product-subarray/ 找出一个序列中乘积最大的连续子序列
+     * @Date 10:38 2020-02-09
+     * @Param
+     * @return
+     **/
+    public int maxProduct(int[] nums) {
+        int[] max = new int[nums.length];
+        int[] min = new int[nums.length];
+
+        min[0] = max[0] = nums[0];
+        int result = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            min[i] = max[i] = nums[i];
+            if (nums[i] > 0) {
+                max[i] = Math.max(max[i], max[i - 1] * nums[i]);
+                min[i] = Math.min(min[i], min[i - 1] * nums[i]);
+            } else if (nums[i] < 0) {
+                max[i] = Math.max(max[i], min[i - 1] * nums[i]);
+                min[i] = Math.min(min[i], max[i - 1] * nums[i]);
+            }
+
+            result = Math.max(result, max[i]);
+        }
+
+        return result;
+    }
+
+    /*
+     * @Author Andy
+     * @Description https://leetcode-cn.com/problems/longest-consecutive-sequence/
+     * @Date 11:01 2020-02-09 给定一个未排序的整数数组，找出最长连续序列的长度
+     * @Param
+     * @return
+     **/
+    public int longestConsecutive(int[] nums) {
+        Arrays.sort(nums);
+        int longest = nums.length == 0 ? 0 : 1,temp = 1;
+
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] - 1 == nums[i-1]) {
+                temp++;
+                if (temp > longest) {
+                    longest = temp;
+                }
+            }else if (nums[i] != nums[i-1]){
+                temp = 1;
+            }
+        }
+        return longest;
+    }
 }

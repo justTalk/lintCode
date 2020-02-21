@@ -1,6 +1,7 @@
 package talk.algorithm;
 
 import talk.algorithm.imp.BackPack;
+import talk.algorithm.leetcode.array.ArraySort;
 
 /**
  * Created by Liu On 2019/5/12
@@ -16,7 +17,10 @@ public class Main {
      */
     public static void main (String[] args)
     {
-        int[] nums = {-2,1,-3,4,-1,2,1,-5,4};
-        BackPack.maxProduct(nums);
+        int[] nums = {100,4,200,1,3,2};
+        ArraySort.sortInsert(nums);
+        for (int i = 0; i < nums.length; i++) {
+            System.out.println(i);
+        }
     }
 }
