@@ -2,10 +2,13 @@ package talk.algorithm.train;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import Node;
+import talk.algorithm.leetcode.link.Node;
 import talk.algorithm.object.ListNode;
 import talk.algorithm.object.TreeNode;
 
@@ -1325,6 +1328,282 @@ public class PrimaryString {
 
   //输入整数数组 arr ，找出其中最小的 k 个数。例如，输入4、5、1、6、2、7、3、8这8个数字，则最小的4个数字是1、2、3、4。
   public int[] getLeastNumbers(int[] arr, int k) {
+    quickSort(arr, 0, arr.length - 1);
+    k = Math.min(k, arr.length);
+    int[] leastNumbers = new int[k];
+    System.arraycopy(arr, 0, leastNumbers, 0, k);
+    return leastNumbers;
+  }
 
+  public void quickSort(int[] arr, int start, int end){
+    if (start >= end) {
+      return;
+    }
+    int povit = partion(arr, start, end);
+    quickSort(arr, start, povit - 1);
+    quickSort(arr, povit + 1, end);
+  }
+
+  public int partion(int[] arr, int start, int end){
+    int povit = end;
+    int lastSmallerPovitIndex = start - 1;
+    for (int i = start; i < end; i++) {
+      if (arr[i] < arr[povit]) {
+        lastSmallerPovitIndex++;
+        if (i == lastSmallerPovitIndex) {
+          continue;
+        }
+        int tmp = arr[lastSmallerPovitIndex];
+        arr[lastSmallerPovitIndex] = arr[i];
+        arr[i] = tmp;
+      }
+    }
+    lastSmallerPovitIndex++;
+    int tmp = arr[lastSmallerPovitIndex];
+    arr[lastSmallerPovitIndex] = arr[povit];
+    arr[povit] = tmp;
+    return lastSmallerPovitIndex;
+  }
+
+  //数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。
+  //你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+  //1.统计数字 2.排序去中位数 3.摩尔投票法
+  public int majorityElement(int[] nums) {
+    int x = 0, votes = 0;
+    for(int num : nums){
+      if(votes == 0) {
+        x = num;
+      }
+      votes += num == x ? 1 : -1;
+    }
+    return x;
+  }
+
+  //输入一个字符串，打印出该字符串中字符的所有排列。
+  //你可以以任意顺序返回这个字符串数组，但里面不能有重复元素。
+  public String[] permutation(String s) {
+    HashMap<String, Boolean> memory = new HashMap<>();
+    Boolean hasCache = new Boolean(true);
+    int[] count = new int[128];
+    String[] per = new String[1];
+    per[0] = String.valueOf(s.charAt(0));
+    count[s.charAt(0)] = 1;
+    for (int i = 1; i < s.length(); i++) {
+      char curChar = s.charAt(i);
+      int repeate = count[curChar];
+      count[curChar] = repeate + 1;
+      int curCount = per.length * (per[0].length() + 1 - repeate) - repeate;
+      String[] curStr = new String[curCount];
+      int index = 0;
+      for (int j = 0; j < per.length; j++) {
+        String lastString = per[j];
+        for (int k = 0; k <= lastString.length(); k++) {
+          char[] str = new char[lastString.length() + 1];
+          str[k] = curChar;
+          if (k >= 1) {
+            System.arraycopy(lastString.toCharArray(), 0, str, 0, k);
+          }
+          System.arraycopy(lastString.toCharArray(), k, str, k + 1, lastString.length() - k);
+          String string = new String(str);
+          if (!memory.containsKey(string)) {
+            curStr[index++] = string;
+            memory.put(string, hasCache);
+          }
+        }
+      }
+      per = curStr;
+      memory.clear();
+    }
+    return per;
+  }
+
+  //输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的循环双向链表。要求不能创建任何新的节点，只能调整树中节点指针的指向。
+  public Node treeToDoublyList(Node root) {
+    if (root != null && root.left == null && root.right == null) {
+      root.left = root;
+      root.right = root;
+      return root;
+    }
+    return treeToDoublyList(root, true);
+  }
+
+  public Node treeToDoublyList(Node root, boolean cycle) {
+    if (root == null || (root.left == null && root.right == null)) {
+      return root;
+    }
+    Node leftHead = treeToDoublyList(root.left, false);
+    Node rightHead = treeToDoublyList(root.right, false);
+    Node leftTail = leftHead, rightTail = rightHead;
+    while (leftTail != null){
+      if (leftTail.right == null) {
+        break;
+      }
+      leftTail = leftTail.right;
+    }
+    while (rightTail != null){
+      if (rightTail.right == null) {
+        break;
+      }
+      rightTail = rightTail.right;
+    }
+    if (leftTail == null) {
+      leftHead = leftTail = root;
+    }else {
+      leftTail.right = root;
+      root.left = leftTail;
+    }
+    if (rightHead == null) {
+      rightTail = rightHead = root;
+    }else {
+      root.right = rightHead;
+      rightHead.left = root;
+    }
+    if (cycle) {
+      leftHead.left = rightTail;
+      rightTail.right = leftHead;
+    }
+    return leftHead;
+  }
+
+  class Node {
+    public int val;
+    public Node left;
+    public Node right;
+    public Node random;
+    public Node next;
+
+    public Node() {}
+
+    public Node(int _val) {
+      val = _val;
+    }
+
+    public Node(int _val,Node _left,Node _right) {
+      val = _val;
+      left = _left;
+      right = _right;
+    }
+  }
+
+  //请实现 copyRandomList 函数，复制一个复杂链表。
+  //在复杂链表中，每个节点除了有一个 next 指针指向下一个节点，还有一个 random 指针指向链表中的任意节点或者 null。
+  public Node copyRandomList(Node head) {
+    HashMap<Node, Node> relation = new HashMap<>();
+    Node newHead = null;
+    Node cousor = head;
+    while (cousor != null){
+      Node curNode = new Node(cousor.val);
+      relation.put(cousor, curNode);
+      cousor = cousor.next;
+    }
+    cousor = head;
+    Node newCousor = null;
+    while (cousor != null){
+      Node newNode = relation.get(cousor);
+      Node randowNode = cousor.random != null ? relation.get(cousor.random) : null;
+      newNode.random = randowNode;
+      if (newHead == null) {
+        newHead = newNode;
+        newCousor = newHead;
+      }else {
+        newCousor.next = newNode;
+        newCousor = newCousor.next;
+      }
+      cousor = cousor.next;
+    }
+
+    return newHead;
+  }
+
+  //输入一棵二叉树和一个整数，打印出二叉树中节点值的和为输入整数的所有路径。
+  //从树的根节点开始往下一直到叶节点所经过的节点形成一条路径。
+  public List<List<Integer>> pathSum(TreeNode root, int sum) {
+    List<List<Integer>> paths = new LinkedList<>();
+    onePath(root, sum, paths, new LinkedList<>());
+    return paths;
+  }
+
+  public void onePath(TreeNode root, int remain, List<List<Integer>> paths, List<Integer> path){
+    if (root == null || root.val > remain) {
+      return;
+    }
+    path.add(root.val);
+    List<Integer> copyPath = new LinkedList<>();
+    for (Integer i : path) {
+      copyPath.add(i);
+    }
+    if (remain - root.val == 0 && root.left == null && root.right == null) {
+      paths.add(path);
+    }else {
+      onePath(root.left, remain - root.val, paths, path);
+      onePath(root.right, remain - root.val, paths, copyPath);
+    }
+  }
+
+  //输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历结果。
+  //如果是则返回 true，否则返回 false。假设输入的数组的任意两个数字都互不相同。
+  public boolean verifyPostorder(int[] postorder) {
+    if (postorder == null || postorder.length == 0) {
+      return true;
+    }
+    return verifyPostorder(postorder, postorder.length - 1, 0);
+  }
+
+  public boolean verifyPostorder(int[] postorder, int root, int start) {
+    if (postorder == null || postorder.length == 0) {
+      return false;
+    }
+    int rootValue = postorder[root];
+    int right  = start;
+    for (; right <= root; right++) {
+      if (postorder[right] >= rootValue) {
+        break;
+      }
+    }
+    int rightLength = root - right;
+    int left = right - 1;
+    boolean verifySubTree = true;
+    if (rightLength > 0) {
+      for (; right < root; right++) {
+        if (postorder[right] < rootValue) {
+          return false;
+        }
+      }
+      right = root - 1;
+      verifySubTree = verifyPostorder(postorder, right, right - rightLength + 1);
+    }
+    if (!verifySubTree) {
+      return false;
+    }
+
+    if (left > start) {
+      for (int i = start; i <= left; i++) {
+        if (postorder[i] > rootValue) {
+          return false;
+        }
+      }
+      verifySubTree = verifyPostorder(postorder, left, start);
+    }
+
+    return verifySubTree;
+  }
+
+  //输入两个链表，找出它们的第一个公共节点。
+  public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+    if (headA == null || headB == null) {
+      return null;
+    }
+    HashMap<ListNode, ListNode> cache = new HashMap<>();
+    while (headA != null){
+      cache.put(headA, headA);
+      headA = headA.next;
+    }
+    while (headB != null){
+      if (cache.containsKey(headB)) {
+        return headB;
+      }
+      headB = headB.next;
+    }
+    return null;
   }
 }
