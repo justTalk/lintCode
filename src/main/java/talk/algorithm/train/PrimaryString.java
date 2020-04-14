@@ -362,7 +362,7 @@ public class PrimaryString {
   }
 
   //把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。
-  //输入一个递增排序的数组的一个旋转，输出旋转数组的最小元素。例如，数组 [3,4,5,1,2] 为 [1,2,3,4,5] 的一个旋转，该数组的最小值为1。  
+  //输入一个递增排序的数组的一个旋转，输出旋转数组的最小元素。例如，数组 [3,4,5,1,2] 为 [1,2,3,4,5] 的一个旋转，该数组的最小值为1。  
 
   public int minArray(int[] numbers) {
     if (numbers == null || numbers.length == 0) {
@@ -692,7 +692,7 @@ public class PrimaryString {
   }
 
   //请实现一个函数，输入一个整数，输出该数二进制表示中 1 的个数。
-  // 例如，把 9 表示成二进制是 1001，有 2 位是 1。因此，如果输入 9，则该函数输出 2。
+  // 例如，把 9 表示成二进制是 1001，有 2 位是 1。因此，如果输入 9，则该函数输出 2。
   public int hammingWeight(int n) {
     int k = n >= 0 ? 0 : 1;
     n = n & ((1 << 31) - 1);
@@ -1605,5 +1605,201 @@ public class PrimaryString {
       headB = headB.next;
     }
     return null;
+  }
+
+  //统计一个数字在排序数组中出现的次数。
+  public int search(int[] nums, int target) {
+    if (nums == null || nums.length == 0) {
+      return 0;
+    }
+    int count = 0;
+    for (int i = 0; i < nums.length; i++) {
+      if (nums[i] == target){
+        count++;
+        continue;
+      }
+      if (count > 0) {
+        break;
+      }
+    }
+    return count;
+  }
+
+  //一个长度为n-1的递增排序数组中的所有数字都是唯一的，并且每个数字都在范围0～n-1之内。
+  //在范围0～n-1内的n个数字中有且只有一个数字不在该数组中，请找出这个数字。
+  public int missingNumber(int[] nums) {
+    int i = 0;
+    for (; i < nums.length; i++) {
+      if (nums[i] != i) {
+        return i;
+      }
+    }
+    return i;
+  }
+
+  //给定一棵二叉搜索树，请找出其中第k大的节点
+  int res, k;
+  public int kthLargest(TreeNode root, int k) {
+    this.k = k;
+    dfs(root);
+    return res;
+  }
+  void dfs(TreeNode root) {
+    if(root == null) {
+      return;
+    }
+    dfs(root.right);
+    if(k == 0) {
+      return;
+    }
+    if(--k == 0) {
+      res = root.val;
+    }
+    dfs(root.left);
+  }
+
+  public int inOrderTree(TreeNode root, int[] values, int start){
+    if (root == null) {
+      return start;
+    }
+    int left = inOrderTree(root.left, values, start);
+    values[left++] = root.val;
+    return inOrderTree(root.right, values, left);
+  }
+
+  //输入一棵二叉树的根节点，求该树的深度。从根节点到叶节点依次经过的节点（含根、叶节点）形成树的一条路径，最长路径的长度为树的深度
+  public int maxDepth(TreeNode root, int depth) {
+    if (root == null) {
+      return depth;
+    }
+    depth++;
+    return Math.max(maxDepth(root.left, depth), maxDepth(root.right, depth));
+  }
+
+  //输入一棵二叉树的根节点，判断该树是不是平衡二叉树。
+  //如果某二叉树中任意节点的左右子树的深度相差不超过1，那么它就是一棵平衡二叉树。
+  public boolean isBalanced(TreeNode root) {
+    if (root == null) {
+      return true;
+    }
+    int leftDepth = maxDepth(root.left, 0);
+    int rightDepth = maxDepth(root.right, 0);
+    if (Math.abs(leftDepth - rightDepth) > 1) {
+      return false;
+    }
+    return isBalanced(root.left) && isBalanced(root.right);
+  }
+
+  //一个整型数组 nums 里除两个数字之外，其他数字都出现了两次。
+  //请写程序找出这两个只出现一次的数字。要求时间复杂度是O(n)，空间复杂度是O(1)。
+  public int[] singleNumbers(int[] nums) {
+    int xor = 0;
+    for (int i = 0; i < nums.length; i++) {
+      xor ^= nums[i];
+    }
+    int a = 0;
+    int b = 0;
+    int h = 1;
+    while ((xor & h) == 0) {
+      h<<=1;
+    }
+    for (int i = 0; i < nums.length; i++) {
+      if ((nums[i] & h) == 0) {
+        a ^= nums[i];
+      }else {
+        b ^= nums[i];
+      }
+    }
+    return new int[]{a, b};
+  }
+
+  //在一个数组 nums 中除一个数字只出现一次之外，其他数字都出现了三次。请找出那个只出现一次的数字
+  public int singleNumber(int[] nums) {
+    if (nums == null || nums.length == 0) {
+      return 0;
+    }
+    int result = 0;
+
+    for (int i = 0; i < 32; i++) {
+      //统计该位1的出现次数情况
+      int count = 0;
+      int index = 1 << i;
+      for (int j : nums) {
+        //该位与操作后的结果不为0，则表示该位为1的情况出现了
+        if ((index & j) != 0) {
+          count++;
+        }
+      }//该位上出现1的次数mod3后为1，表示出现一次的数字该位为1
+      if (count % 3 == 1) {
+        result |= index;
+      }
+    }
+    return result;
+  }
+
+  //输入一个递增排序的数组和一个数字s，在数组中查找两个数，使得它们的和正好是s。如果有多对数字的和等于s，则输出任意一对即可。
+  public int[] twoSum(int[] nums, int target) {
+    for (int i = 0; i < nums.length; i++) {
+      int diff = target - nums[i];
+      int start =  i + 1;
+      int end = nums.length  - 1;
+      while (start <= end){
+        int mid = (start + end)  / 2;
+        if (nums[mid] == diff) {
+          return new int[]{nums[i], nums[mid]};
+        }else if (nums[mid] > diff) {
+          end = mid - 1;
+        }else {
+          start = mid + 1;
+        }
+      }
+    }
+    return new int[0];
+  }
+
+  public int[] twoSumOpt(int[] nums, int target) {
+    int start = 0;
+    int end = nums.length - 1;
+    while (start <= end){
+      int add = nums[start] + nums[end];
+      if (add == target) {
+        return new int[]{nums[start], nums[end]};
+      }else if (add > target) {
+        end--;
+      }else {
+        start++;
+      }
+    }
+    return new int[0];
+  }
+
+  //输入一个正整数 target ，输出所有和为 target 的连续正整数序列（至少含有两个数）。
+  //序列内的数字由小到大排列，不同序列按照首个数字从小到大排列。
+  public int[][] findContinuousSequence(int target) {
+    int[][] result = new int[target][];
+    int startIndex = 0;
+    int endIndex = 1;
+    int add = startIndex + endIndex + 2;
+    int size = 0;
+    while (startIndex < endIndex && endIndex < target){
+      if (add == target) {
+        int[] item = new int[endIndex - startIndex + 1];
+        for (int i = 0; i < item.length; i++) {
+          item[i] = startIndex + i + 1;
+        }
+        result[size++] = item;
+        endIndex++;
+        add += endIndex + 1;
+      }else if(add < target){
+        endIndex++;
+        add += endIndex + 1;
+      }else {
+        startIndex++;
+        add -= startIndex;
+      }
+    }
+    int[][] s = new int[size][];
+    System.arraycopy(result, 0, s, 0, size);
+    return s;
   }
 }
