@@ -2,13 +2,12 @@ package talk.algorithm.train;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import Node;
-import talk.algorithm.leetcode.link.Node;
 import talk.algorithm.object.ListNode;
 import talk.algorithm.object.TreeNode;
 
@@ -1801,5 +1800,432 @@ public class PrimaryString {
     int[][] s = new int[size][];
     System.arraycopy(result, 0, s, 0, size);
     return s;
+  }
+
+  //输入一个英文句子，翻转句子中单词的顺序，但单词内字符的顺序不变。为简单起见，标点符号和普通字母一样处理。
+  //例如输入字符串"I am a student. "，则输出"student. a am I"。
+  //"  hello world!  "
+  public String reverseWords(String s) {
+    if (s == null || s.length() == 0) {
+      return "";
+    }
+    int size = 0;
+    int length = s.length();
+    char[] reverse = new char[length];
+    int end = 0;
+    for (int i = length - 1; i >= 0; i--) {
+      if (s.charAt(i) != ' ') {
+        end = i;
+        break;
+      }
+    }
+
+    for (int i = 0; i <= end; i++) {
+      if (s.charAt(i) == ' ') {
+        if (size == 0 || reverse[size - 1] == ' ') {
+          continue;
+        }
+      }
+      reverse[size++] = s.charAt(i);
+    }
+    char[] reversed = new char[size];
+    int lastIndex = size;
+    int start = 0;
+    end = 0;
+    for (; end < size; end++) {
+      if (reverse[end] == ' '){
+        System.arraycopy(reverse, start, reversed, lastIndex - (end - start), end - start);
+        lastIndex -= (end - start);
+        reversed[--lastIndex] = ' ';
+        start = end + 1;
+        continue;
+      }
+      if (end == size - 1){
+        System.arraycopy(reverse, start, reversed, lastIndex - (end - start + 1), end - start + 1);
+      }
+    }
+    return new String(reversed);
+  }
+
+  //字符串的左旋转操作是把字符串前面的若干个字符转移到字符串的尾部。请定义一个函数实现字符串左旋转操作的功能。
+  //比如，输入字符串"abcdefg"和数字2，该函数将返回左旋转两位得到的结果"cdefgab"。
+  public String reverseLeftWords(String s, int n) {
+    if (s == null || s.length() <= 1) {
+      return s;
+    }
+    char[] chars = s.toCharArray();
+    char[] reverse = new char[chars.length];
+    System.arraycopy(chars, n, reverse, 0, chars.length - n);
+    System.arraycopy(chars, 0, reverse, chars.length - n, n);
+    return new String(reverse);
+  }
+
+  //给定一个数组 nums 和滑动窗口的大小 k，请找出所有滑动窗口里的最大值。
+  public int[] maxSlidingWindow(int[] nums, int k) {
+    if (nums.length == 1) {
+      return new int[]{nums[0]};
+    }
+    int[] max = new int[nums.length - k + 1];
+    int size = 0;
+    for (int i = 0; i <= nums.length - k; i++) {
+      max[size] = nums[i];
+      for (int j = 1; j < k; j++) {
+        if (max[size] < nums[i + j]){
+          max[size] = nums[i + j];
+        }
+      }
+      size++;
+    }
+    return max;
+  }
+
+  public int[] maxSlidingWindowOpt(int[] nums, int k) {
+    if (nums == null || k < 1 || nums.length < k) {
+      return new int[0];
+    }
+
+    int index = 0;
+    int[] res = new int[nums.length - k + 1];
+    LinkedList<Integer> qMax = new LinkedList<>();
+
+    for (int i = 0; i < nums.length; i++) {
+      // 在队列不为空的情况下，如果队列尾部的元素要比当前的元素小，或等于当前的元素
+      // 那么为了维持从大到小的原则，我必须让尾部元素弹出
+      while (!qMax.isEmpty() && nums[qMax.peekLast()] <= nums[i]) {
+        qMax.pollLast();
+      }
+      // 不走 while 的话，说明我们正常在队列尾部添加元素
+      qMax.addLast(i);
+      // 如果滑动窗口已经略过了队列中头部的元素，则将头部元素弹出
+      if (qMax.peekFirst() == (i - k)) {
+        qMax.pollFirst();
+      }
+      // 看看窗口有没有形成，只有形成了大小为 k 的窗口，我才能收集窗口内的最大值
+      if (i >= (k - 1)) {
+        res[index++] = nums[qMax.peekFirst()];
+      }
+    }
+    return res;
+  }
+
+  //把n个骰子扔在地上，所有骰子朝上一面的点数之和为s。输入n，打印出s的所有可能的值出现的概率
+  //你需要用一个浮点数数组返回答案，其中第 i 个元素代表这 n 个骰子所能掷出的点数集合中第 i 小的那个的概率。
+  public double[] twoSum(int n) {
+    int[][] dp = new int[n+1][6*n+1];
+    //边界条件
+    for(int s=1;s<=6;s++) {
+      dp[1][s]=1;
+    }
+    for(int i=2;i<=n;i++){
+      for(int s=i;s<=6*i;s++){
+        //求dp[i][s]
+        for(int d=1;d<=6;d++){
+          if(s-d<i-1) {
+            break;//为0了
+          }
+          dp[i][s]+=dp[i-1][s-d];
+        }
+      }
+    }
+    double total = Math.pow((double)6,(double)n);
+    double[] ans = new double[5*n+1];
+    for(int i=n;i<=6*n;i++){
+      ans[i-n]=((double)dp[n][i])/total;
+    }
+    return ans;
+  }
+
+  //从扑克牌中随机抽5张牌，判断是不是一个顺子，即这5张牌是不是连续的。
+  //2～10为数字本身，A为1，J为11，Q为12，K为13，而大、小王为 0 ，可以看成任意数字。A 不能视为 14。
+  public boolean isStraight(int[] nums) {
+    int startValue = 14;
+    for (int i = 0; i < nums.length; i++) {
+      if (nums[i] == 0) {
+        continue;
+      }
+      if (nums[i] < startValue) {
+        startValue = nums[i];
+      }
+    }
+    for (int i = 1; i < 5; i++) {
+      int zeroIndex = -1;
+      int j = 0;
+      for (; j < nums.length; j++) {
+        if (nums[j] == (startValue + i)) {
+          nums[j] = -1;
+          zeroIndex = -1;
+          break;
+        }
+        if (nums[j] == 0){
+          zeroIndex = j;
+        }
+      }
+      if (zeroIndex >= 0) {
+        nums[zeroIndex] = -1;
+        continue;
+      }
+      if (j < nums.length) {
+        continue;
+      }
+      return false;
+    }
+    return true;
+  }
+
+  //0,1,,n-1这n个数字排成一个圆圈，从数字0开始，每次从这个圆圈里删除第m个数字。求出这个圆圈里剩下的最后一个数字。
+  //例如，0、1、2、3、4这5个数字组成一个圆圈，从数字0开始每次删除第3个数字，则删除的前4个数字依次是2、0、4、1，因此最后剩下的数字是3。
+  public int lastRemaining(int n, int m) {
+    Node cousor = buildNodes(n);
+    int index = 1;
+    if (m == 1) {
+      return n -1;
+    }
+    while (n > 1){
+      if ((index + 1) % m == 0) {
+        cousor.next = cousor.next.next;
+        cousor = cousor.next;
+        index = 1;
+        n--;
+        continue;
+      }
+      cousor = cousor.next;
+      index++;
+    }
+    return cousor.val;
+  }
+
+  private Node buildNodes(int n){
+    Node head = new Node(0);
+    Node cousor = head;
+    for (int i = 1; i < n; i++) {
+      cousor.next = new Node(i);
+      cousor = cousor.next;
+    }
+    cousor.next = head;
+    return head;
+  }
+
+  public int lastRemainingOpt(int n, int m) {
+    int ans = 0;
+    // 最后一轮剩下2个人，所以从2开始反推
+    for (int i = 2; i <= n; i++) {
+      ans = (ans + m) % i;
+    }
+    return ans;
+  }
+
+  //写一个函数，求两个整数之和，要求在函数体内不得使用 “+”、“-”、“*”、“/” 四则运算符号。
+  public int add(int a, int b) {
+    int bit = 1;
+    int add = 0;
+    boolean lastCarryBit = false;
+    while (bit <= 32){
+      int bitA = a & bit;
+      int bitB = b & bit;
+      if (bitA != 0 && bitB != 0) {
+        if (lastCarryBit) {
+          add |= bit;
+        }
+        lastCarryBit = true;
+        bit<<=1;
+        continue;
+      }
+      if (bitA != 0 || bitB != 0) {
+        if (!lastCarryBit) {
+          add |= bit;
+        }else {
+          lastCarryBit = true;
+        }
+        bit<<=1;
+        continue;
+      }else {
+        if (lastCarryBit) {
+          lastCarryBit = false;
+          add |= bit;
+        }
+        bit<<=1;
+      }
+    }
+    return add;
+  }
+
+  public int addAnswer(int a, int b) {
+    while (b != 0) {
+      int plus = (a ^ b); // 求和（不计进位）. 相同位置0，相反位置1
+      b = ((a & b) << 1); // 计算进位. 先保留同为1的位，都为1的位要向左进位，因此左移1位
+      a = plus;
+    }
+    return a;
+  }
+
+  //给定一个数组 A[0,1,…,n-1]，请构建一个数组 B[0,1,…,n-1]，其中 B 中的元素 B[i]=A[0]×A[1]×…×A[i-1]×A[i+1]×…×A[n-1]。不能使用除法。
+  public int[] constructArr(int[] a) {
+    if(a==null||a.length==0)return new int[]{};
+    if(a.length==1){//只有一个元素返回[1]
+      int[] B={1};
+      return B;
+    }
+    if(a.length==2){//有两个元素返回对调值
+      int[] B={a[1],a[0]};
+      return B;
+    }
+    int[] res=new int[a.length];//结果数组
+    int[] dp=new int[a.length];//前dp数组
+    int[] dph=new int[a.length];//后dp数组
+    dp[0]=a[0];//初始化
+    dph[a.length-1]=a[a.length-1];//初始化
+    for(int i=a.length-2;i>=0;i--){//循环赋值
+      dph[i]=dph[i+1]*a[i];
+    }
+    for(int i=1;i<a.length;i++){//循环赋值
+      dp[i]=dp[i-1]*a[i];
+    }
+    res[0]=dph[1];
+    res[a.length-1]=dp[a.length-2];
+    for(int i=1;i<a.length-1;i++){//计算
+      res[i]=dp[i-1]*dph[i+1];
+    }
+    return res;
+  }
+
+  //求 1+2+...+n ，要求不能使用乘除法、for、while、if、else、switch、case等关键字及条件判断语句（A?B:C）。
+  public int sumNums(int n) {
+    int sum = n;
+    boolean b = (n > 0) && ((sum += sumNums(n - 1)) > 0);
+    return sum;
+  }
+
+
+  //给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先。
+  //百度百科中最近公共祖先的定义为：
+  //“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+  public TreeNode lowestSortCommonAncestorOpt(TreeNode root, TreeNode p, TreeNode q) {
+    while (root!=null){
+      if (p.val<root.val && q.val<root.val){
+        root=root.left;
+      }else if (p.val>root.val && q.val>root.val){
+        root=root.right;
+      }else{
+        break;
+      }
+    }
+    return root;
+  }
+
+  public TreeNode lowestSortCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+    Stack<TreeNode> path = new Stack<>();
+    findSortNode(root, p, path);
+    while (!path.isEmpty()){
+      TreeNode curRoot = path.pop();
+      if (findSortNode(curRoot, q, null) != null) {
+        return curRoot;
+      }
+    }
+    return null;
+  }
+
+  public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+    if (root.val == p.val || root.val == q.val) {
+      return root;
+    }
+    TreeNode p1 = findNode(root.left, p);
+    TreeNode q1 = findNode(root.left, q);
+    if (p1 != null && q1 != null) {
+      if (findNode(p1, q) != null) {
+        return p1;
+      }
+      if (findNode(p1, q) != null) {
+        return p1;
+      }
+      return lowestSortCommonAncestor(root.left, p, q);
+    }
+    if (p1 == null && q1 == null) {
+      p1 = findNode(root.right, p);
+      if (findNode(p1, q) != null) {
+        return p1;
+      }
+      q1 = findNode(root.right, q);
+      if (findNode(p1, q) != null) {
+        return p1;
+      }
+      return lowestSortCommonAncestor(root.right, p, q);
+    }
+    return root;
+  }
+
+  public TreeNode findSortNode(TreeNode root, TreeNode target, Stack<TreeNode> path){
+    if (path != null) {
+      path.push(root);
+    }
+    if (root == null || target.val == root.val) {
+      return root;
+    }
+    if (target.val > root.val) {
+      return findSortNode(root.right, target, path);
+    }
+    return findSortNode(root.left, target, path);
+  }
+
+  public TreeNode findNode(TreeNode root, TreeNode target){
+    if (root == null || target.val == root.val) {
+      return root;
+    }
+    TreeNode node = findNode(root.right, target);
+    if (node != null) {
+      return node;
+    }
+    return findNode(root.left, target);
+  }
+
+  //假设把某股票的价格按照时间先后顺序存储在数组中，请问买卖该股票一次可能获得的最大利润是多少？
+  //dp[i] = dp[i-1], prices[i] - min(prices[0：i])
+  public int maxProfit(int[] prices) {
+    int[] dp = new int[prices.length];
+    int min = prices[0];
+    for (int i = 1; i < prices.length; i++) {
+      dp[i] = Math.max(dp[i - 1], prices[i] - min);
+      if (min > prices[i]) {
+        min = prices[i];
+      }
+    }
+    return dp[prices.length -1];
+  }
+
+  //超出时间限制
+  public int reversePairs(int[] nums) {
+    if (nums.length==0) {
+      return 0;
+    }
+    int left = 0, right = nums.length-1;
+    int[] copy = Arrays.copyOf(nums, nums.length); //辅助空间
+    return reversePairs(nums, copy, left, right); // 入口nums和copy是一致的，两个数组来回倒腾
+
+  }
+  int reversePairs(int[] nums, int[] copy, int left, int right) {
+    if (left>= right) { //空或者单元素
+      return 0;
+    }
+    int mid = left+(right-left)/2;
+    int lpairs = reversePairs(copy, nums, left, mid); //排序nums
+    int rpairs = reversePairs(copy, nums, mid+1, right);
+    int li = mid,ri = right,ci=right;
+    int count = 0;
+    while (li>=left && ri>mid) {
+      // 拷贝两边的较大值，仅当左边大于右边时计算两边之间的逆序对
+      if (nums[li]>nums[ri]) {
+        count += ri-mid;  //当前左边li可以构成 ri-mid个逆序对 比ri前面的都大
+        copy[ci--] = nums[li--];
+      } else {
+        copy[ci--] = nums[ri--];
+      }
+    }
+    while (li>=left) { //剩余小值都在左边，无需增加对数
+      copy[ci--] = nums[li--];
+    }
+    while (ri>mid) { //说明左边所有值都比当前右边的大，每个右边的小值都有mid-left+1对,
+      copy[ci--] = nums[ri--];
+      //            count += mid-left+1; //已经在left比较时加过了
+    }
+    return lpairs+rpairs+count;
   }
 }
