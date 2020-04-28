@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import talk.algorithm.object.ListNode;
+import talk.algorithm.object.TreeNode;
 
 /**
  * @Description: 字节跳动过题库
@@ -208,4 +209,84 @@ public class Train {
     }
   }
 
+  //给定一棵二叉树，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
+  public void rightSideView(List<TreeNode> parents, List<Integer> canSeeNodes) {
+    if (parents.isEmpty()){
+      return;
+    }
+    TreeNode rightNode = parents.get(parents.size() - 1);
+    canSeeNodes.add(rightNode.val);
+    List<TreeNode> nextLevel = new ArrayList<>();
+    for (int i = 0; i < parents.size(); i++) {
+      TreeNode parent = parents.get(i);
+      if (parent.left != null){
+        nextLevel.add(parent.left);
+      }
+      if (parent.right != null){
+        nextLevel.add(parent.right);
+      }
+    }
+    rightSideView(nextLevel, canSeeNodes);
+  }
+
+  //给定两个大小为 m 和 n 的有序数组 nums1 和 nums2。
+  //请你找出这两个有序数组的中位数，并且要求算法的时间复杂度为 O(log(m + n))。
+  //你可以假设 nums1 和 nums2 不会同时为空。
+  public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+    if (nums1 == null || nums1.length == 0) {
+      int mid = (nums2.length - 1) / 2;
+      return nums2.length % 2 == 0 ? (nums2[mid] + nums2[mid + 1]) * 1.0f / 2 : nums2[mid];
+    }
+    if (nums2 == null || nums2.length == 0) {
+      int mid = (nums1.length - 1) / 2;
+      return nums1.length % 2 == 0 ? (nums1[mid] + nums1[mid + 1])  * 1.0f/ 2 : nums1[mid];
+    }
+    int mn = nums1.length + nums2.length;
+    int[] sort = new int[mn / 2 + 1];
+    int index1 = 0;
+    int index2 = 0;
+    for (int i = 0; i < sort.length; i++) {
+      if (index1 >= nums1.length){
+        sort[i] = nums2[index2++];
+        continue;
+      }
+      if (index2 >= nums2.length){
+        sort[i] = nums1[index1++];
+        continue;
+      }
+      if (nums1[index1] < nums2[index2]) {
+        sort[i] = nums1[index1++];
+      }else {
+        sort[i] = nums2[index2++];
+      }
+    }
+    return mn % 2 != 0 ? sort[sort.length - 1] : (sort[sort.length - 1] + sort[sort.length - 2]) * 1.0f / 2;
+  }
+
+  //数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。
+  public List<String> generateParenthesis(int n) {
+    int leftCount = n - 1;
+    int rightCont = n - 1;
+    List<String> combine = new ArrayList<>();
+    char[] path = new char[n * 2];
+    path[0] = '(';
+    generatCombine(leftCount, rightCont, combine, path, 1, 1);
+    return combine;
+  }
+
+  public void generatCombine(int leftCount, int rightCount, List<String> combine, char[] path, int stepIndex, int leftNum){
+    if (path.length == stepIndex + 1) {
+      path[stepIndex] = ')';
+      combine.add(new String(path));
+      return;
+    }
+    if (leftCount > 0) {
+      path[stepIndex] = '(';
+      generatCombine(leftCount - 1, rightCount, combine, path, stepIndex + 1, leftNum + 1);
+    }
+    if (rightCount > 0 && leftNum > 0){
+      path[stepIndex] = ')';
+      generatCombine(leftCount, rightCount - 1, combine, path, stepIndex+1, leftNum - 1);
+    }
+  }
 }
